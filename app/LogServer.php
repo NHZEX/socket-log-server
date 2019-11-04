@@ -86,12 +86,13 @@ class LogServer
             $this->log("receive[#{$req->fd}] invalid request: {$req->server['request_uri']}");
             $res->setStatusCode(426);
             $res->end();
+            return;
         }
         $message = $req->rawContent();
+        $res->end();
         $len = strlen($message);
         $this->log("receive[#{$req->fd}] message: send {$len} byte to {$req->server['request_uri']}");
         $this->broadcast($message, $req->server['request_uri']);
-        $res->end();
     }
 
     protected function log(string $msg)
