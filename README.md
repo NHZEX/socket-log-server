@@ -12,6 +12,7 @@
 ## 启动 
 
 ```shell script
+composer install --no-dev
 php run.php
 ```
 
