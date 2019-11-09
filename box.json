@@ -1,0 +1,33 @@
+{
+    "main": "run.php",
+    "output": "socket-log.phar",
+    "directories": [
+        "app"
+    ],
+    "finder": [
+        {
+            "notName": "/LICENSE|.*\\.md|.*\\.dist|composer\\.json|composer\\.lock/",
+            "exclude": [
+                "doc",
+                "docs",
+                "test",
+                "test_old",
+                "tests",
+                "Tests",
+                "vendor-bin"
+            ],
+            "in": "vendor"
+        },
+        {
+            "name": "composer.json",
+            "in": "."
+        }
+    ],
+    "compression": "NONE",
+    "compactors": [
+        "KevinGH\\Box\\Compactor\\Json",
+        "KevinGH\\Box\\Compactor\\Php",
+        "KevinGH\\Box\\Compactor\\PhpScoper"
+    ],
+    "git-version": "phar-version"
+}

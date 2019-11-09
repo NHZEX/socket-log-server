@@ -26,7 +26,7 @@ class LogServer
             'pid_file' => RUNTIME_PATH . 'swoole.pid',
             'enable_coroutine' => true,
             'send_yield'       => true,
-            // 'websocket_compression' => true,
+            'websocket_compression' => true,
         ]);
         $this->server->handle('/', function (Request $request, Response $response) {
             if ('websocket' === ($request->header['upgrade'] ?? '')) {
