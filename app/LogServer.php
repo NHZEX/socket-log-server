@@ -88,7 +88,10 @@ class LogServer
             $res->end();
             return;
         }
-        $message = $req->rawContent();
+        $body_len = (int) ($req->header['content-length'] ?: 0);
+        $http_data = $req->getData();
+        $message = substr($http_data, strlen($http_data) - $body_len);
+        // $message = $req->rawContent();
         $res->end();
         $len = strlen($message);
         $this->log("receive[#{$req->fd}] message: send {$len} byte to {$req->server['request_uri']}");
