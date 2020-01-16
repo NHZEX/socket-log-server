@@ -52,7 +52,7 @@ class LogServer
         $this->log("broadcast message to {$uri}, count: " . count($clients));
         foreach ($clients as $ws) {
             /** @var Response $ws */
-            $ws->push($data);
+            $ws->push($data, SWOOLE_WEBSOCKET_OPCODE_TEXT, SWOOLE_WEBSOCKET_FLAG_FIN | SWOOLE_WEBSOCKET_FLAG_COMPRESS);
         }
     }
 

@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d2f6e19a7db48a1420e7c82818fcbcc3",
+    "content-hash": "33315a7e4fb14e41414e1aa0bd026aac",
     "packages": [],
     "packages-dev": [
         {
-            "name": "swoft/swoole-ide-helper",
-            "version": "v4.4.8",
+            "name": "swoole/ide-helper",
+            "version": "4.4.15",
             "source": {
                 "type": "git",
-                "url": "https://github.com/swoft-cloud/swoole-ide-helper.git",
-                "reference": "dfbe372cca6baccd362bc276aa07c5d65b2c1b36"
+                "url": "https://github.com/swoole/ide-helper.git",
+                "reference": "db5d83c0158054e9d4037d00e3d4e95c11d87932"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swoft-cloud/swoole-ide-helper/zipball/dfbe372cca6baccd362bc276aa07c5d65b2c1b36",
-                "reference": "dfbe372cca6baccd362bc276aa07c5d65b2c1b36",
+                "url": "https://api.github.com/repos/swoole/ide-helper/zipball/db5d83c0158054e9d4037d00e3d4e95c11d87932",
+                "reference": "db5d83c0158054e9d4037d00e3d4e95c11d87932",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -27,19 +27,25 @@
                     }
                 ]
             },
+            "require-dev": {
+                "guzzlehttp/guzzle": "~6.5.0",
+                "squizlabs/php_codesniffer": "~3.5.0",
+                "symfony/filesystem": "~4.3.0",
+                "zendframework/zend-code": "~3.3.0"
+            },
             "type": "library",
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "Apache-2.0"
             ],
-            "description": "IDE helper for Swoft and Swoole",
-            "keywords": [
-                "ide-helper",
-                "php",
-                "swoft",
-                "swoole"
+            "authors": [
+                {
+                    "name": "Team Swoole",
+                    "email": "team@swoole.com"
+                }
             ],
-            "time": "2019-10-17T09:54:14+00:00"
+            "description": "IDE help files for Swoole.",
+            "time": "2020-01-15T07:16:10+00:00"
         }
     ],
     "aliases": [],
@@ -49,7 +55,7 @@
     "prefer-lowest": false,
     "platform": {
         "php": ">=7.1",
-        "ext-swoole": ">=4.4"
+        "ext-swoole": "^4.4.14"
     },
     "platform-dev": []
 }
