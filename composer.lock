@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "33315a7e4fb14e41414e1aa0bd026aac",
+    "content-hash": "73682fe97ae048f6388fabaa6c700e45",
     "packages": [],
     "packages-dev": [
         {
             "name": "swoole/ide-helper",
-            "version": "4.4.15",
+            "version": "4.4.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/swoole/ide-helper.git",
-                "reference": "db5d83c0158054e9d4037d00e3d4e95c11d87932"
+                "reference": "61bfb54d7fca13309b005dd7375d171d6d8e8162"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swoole/ide-helper/zipball/db5d83c0158054e9d4037d00e3d4e95c11d87932",
-                "reference": "db5d83c0158054e9d4037d00e3d4e95c11d87932",
+                "url": "https://api.github.com/repos/swoole/ide-helper/zipball/61bfb54d7fca13309b005dd7375d171d6d8e8162",
+                "reference": "61bfb54d7fca13309b005dd7375d171d6d8e8162",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -45,7 +45,7 @@
                 }
             ],
             "description": "IDE help files for Swoole.",
-            "time": "2020-01-15T07:16:10+00:00"
+            "time": "2020-04-26T02:33:56+00:00"
         }
     ],
     "aliases": [],
@@ -57,5 +57,6 @@
         "php": ">=7.1",
         "ext-swoole": "^4.4.14"
     },
-    "platform-dev": []
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
 }

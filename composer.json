@@ -15,7 +15,7 @@
         "ext-swoole": "^4.4.14"
     },
     "require-dev": {
-        "swoole/ide-helper": "^4.4"
+        "swoole/ide-helper": "~4.4.18"
     },
     "config": {
         "preferred-install": "dist",
