@@ -1,13 +1,13 @@
+#!/usr/bin/env php
 <?php
 
-use App\LogServer;
-use function Swoole\Coroutine\run;
+namespace SocketLog;
 
-require __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+use App\Server;
+use Workerman\Worker;
 
-run(function () {
-    echo 'socket-log server v-' . APP_VERSION . ' start up' . PHP_EOL;
+require_once __DIR__ . '/vendor/autoload.php';
 
-    $server = new LogServer();
-    $server->start();
-});
+new Server();
+
+Worker::runAll();
