@@ -3,7 +3,8 @@
     "output": "socket-log.phar",
     "check-requirements": true,
     "directories": [
-        "app"
+        "src",
+        "protocols"
     ],
     "finder": [
         {

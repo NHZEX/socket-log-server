@@ -6,9 +6,10 @@ return [
     'patchers' => [],                       // callable[]
     'files-whitelist' => [],                // string[]
     'whitelist' => [
-        'Swoole\\*'
+        'Swoole\\*',
+        'Workerman\\*'
     ],                                      // string[]
-    'whitelist-global-constants' => true,   // bool
+    'whitelist-global-constants' => false,   // bool
     'whitelist-global-classes' => true,     // bool
     'whitelist-global-functions' => true,   // bool
 ];
