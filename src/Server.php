@@ -110,6 +110,5 @@ class Server
             $conn = $this->websocket->connections[$id];
             $conn->send($data);
         }
-        dump($uri);
     }
 }
