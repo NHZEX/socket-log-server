@@ -4,3 +4,4 @@
 /runtime
 /.env
 /.php_cs.cache
+*.phar

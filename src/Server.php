@@ -95,7 +95,7 @@ class Server
     }
 
     public function onWsClose (TcpConnection $connection) {
-        $request_uri = $this->wsClient[$connection->id];
+        $request_uri = $this->wsClient[$connection->id] ?? '<undefined>';
         unset($this->broadcastBind[$request_uri][$connection->id]);
         unset($this->wsClient[$connection->id]);
         log("ws client disconnect：{$request_uri}[{$connection->id}]");
