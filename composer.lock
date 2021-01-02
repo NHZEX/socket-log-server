@@ -183,16 +183,16 @@
         },
         {
             "name": "symfony/var-dumper",
-            "version": "v5.2.0",
+            "version": "v5.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/var-dumper.git",
-                "reference": "173a79c462b1c81e1fa26129f71e41333d846b26"
+                "reference": "13e7e882eaa55863faa7c4ad7c60f12f1a8b5089"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/173a79c462b1c81e1fa26129f71e41333d846b26",
-                "reference": "173a79c462b1c81e1fa26129f71e41333d846b26",
+                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/13e7e882eaa55863faa7c4ad7c60f12f1a8b5089",
+                "reference": "13e7e882eaa55863faa7c4ad7c60f12f1a8b5089",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -257,7 +257,7 @@
                 "dump"
             ],
             "support": {
-                "source": "https://github.com/symfony/var-dumper/tree/v5.2.0"
+                "source": "https://github.com/symfony/var-dumper/tree/v5.2.1"
             },
             "funding": [
                 {
@@ -273,20 +273,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2020-11-27T00:39:34+00:00"
+            "time": "2020-12-16T17:02:19+00:00"
         },
         {
             "name": "workerman/workerman",
-            "version": "v4.0.17",
+            "version": "v4.0.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/walkor/Workerman.git",
-                "reference": "2998940bb6a3a684842585a248ca1524143858f6"
+                "reference": "02930876526479c7e4123ef1dc8d23d509d40e72"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/walkor/Workerman/zipball/2998940bb6a3a684842585a248ca1524143858f6",
-                "reference": "2998940bb6a3a684842585a248ca1524143858f6",
+                "url": "https://api.github.com/repos/walkor/Workerman/zipball/02930876526479c7e4123ef1dc8d23d509d40e72",
+                "reference": "02930876526479c7e4123ef1dc8d23d509d40e72",
                 "shasum": "",
                 "mirrors": [
                     {
@@ -332,7 +332,7 @@
                 "source": "https://github.com/walkor/workerman",
                 "wiki": "http://doc.workerman.net/"
             },
-            "time": "2020-11-27T04:14:54+00:00"
+            "time": "2021-01-02T06:14:59+00:00"
         }
     ],
     "packages-dev": [],
