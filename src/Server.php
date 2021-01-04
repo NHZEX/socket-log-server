@@ -10,6 +10,8 @@ use Workerman\Worker;
 use function func\call_wrap;
 use function func\log;
 use function func\str_starts_with;
+use function sprintf;
+use function str_replace;
 
 class Server
 {
@@ -29,6 +31,7 @@ class Server
     public function __construct()
     {
         $this->http = new Worker('http://0.0.0.0:1116');
+        $this->http->name = 'logx';
         $this->http->count = 1;
         $this->http->onMessage = call_wrap([$this, 'onRequest']);
         $this->http->onWorkerStart = call_wrap([$this, 'onWorkerStart']);
@@ -45,6 +48,12 @@ class Server
         $this->websocket->onClose = call_wrap([$this, 'onWsClose']);
 
         $this->websocket->listen();
+
+        Worker::safeEcho(sprintf(
+            'Websocket server(%s) listen success%s',
+            str_replace('websocketEx', 'ws', $this->websocket->getSocketName()),
+            PHP_EOL
+        ));
     }
 
     public function onRequest(TcpConnection $connection, Request $request)
