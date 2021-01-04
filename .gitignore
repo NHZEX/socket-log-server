@@ -4,4 +4,6 @@
 /runtime
 /.env
 /.php_cs.cache
+/.box_dump
+/workerman.log
 *.phar

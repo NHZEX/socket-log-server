@@ -20,11 +20,14 @@
     "require": {
         "php": ">=7.1",
         "ext-zlib": "*",
-        "symfony/polyfill-php80": "^1.18",
-        "symfony/var-dumper": "^5.0",
+        "symfony/polyfill-php72": "^1",
+        "symfony/polyfill-php73": "^1",
+        "symfony/polyfill-php74": "^1",
+        "symfony/polyfill-php80": "^1",
         "workerman/workerman": "^4.0"
     },
     "require-dev": {
+        "symfony/var-dumper": "^5"
     },
     "config": {
         "preferred-install": "dist",
