@@ -1,6 +1,12 @@
 {
     "name": "nhzex/socket-log-server",
     "type": "project",
+    "authors": [
+        {
+            "name": "auooru",
+            "email": "auooru@outlook.com"
+        }
+    ],
     "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
