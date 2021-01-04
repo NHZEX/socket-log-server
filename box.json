@@ -30,5 +30,6 @@
         "KevinGH\\Box\\Compactor\\Json",
         "KevinGH\\Box\\Compactor\\Php"
     ],
-    "git-version": "phar-version"
+    "datetime": "compile-datetime",
+    "git-tag": "app-version"
 }
