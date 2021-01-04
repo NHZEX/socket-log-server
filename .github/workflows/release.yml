@@ -13,18 +13,32 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Setup PHP with PECL extension
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: '8.0'
+          ini-values: phar.readonly=0
+          tools: composer:v2
+          coverage: none
           extensions: zip
+      - name: Get composer cache directory
+        id: composercache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+      - name: Cache vendor
+        uses: actions/cache@v2
+        env:
+          cache-name: composer-cache
+        with:
+          path: ${{ steps.composercache.outputs.dir }}
+          key: ${{ runner.os }}-build-${{ env.cache-name }}
       - name: Download box
         run: |
           wget https://github.com/box-project/box/releases/download/3.11.1/box.phar
       - name: Build project # This would actually build your project, using zip for an example artifact
         run: |
-          composer validate
-          composer install --prefer-dist --no-dev --no-progress --no-suggest
+          composer install --prefer-dist --no-dev --no-progress
           php box.phar compile
       - name: Create Release
         id: create_release
