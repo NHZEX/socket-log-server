@@ -1,16 +1,17 @@
 # Socket Log Server
 
-thinkphp socket-log 驱动的日志转发服务
+thinkphp socket-log 日志转发服务
 
-## 需要环境
+## 环境需求
 
 - php >= 7.1
+- ext-zip
 
-## 启动 
+## 启动服务 
 
-```shell script
-composer install --no-dev
-php run.php
-```
+1. 下载 [socket-log.phar](https://github.com/NHZEX/socket-log-server/releases/latest/download/socket-log.phar)  
+2. ```php socket-log.phar start -d```
 
-默认端口 1229
+## 服务端口 
+  - http server: 1116
+  - websocket: 1229
