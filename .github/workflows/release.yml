@@ -43,7 +43,7 @@ jobs:
         run: |
           composer install --prefer-dist --no-dev --no-progress
           php box.phar compile
-      - uses: actions/upload-artifact@v1
+      - uses: actions/upload-artifact@v2
         name: Upload the PHAR artifact
         with:
           name: socket-log.phar
@@ -56,13 +56,11 @@ jobs:
       - build-phar
     if: github.event_name == 'release'
     steps:
-      - uses: actions/upload-artifact@v1
-        name: Upload the PHAR artifact
+      - uses: actions/download-artifact@v2
         with:
           name: socket-log.phar
           path: .
       - name: Upload Release Asset
-        id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
