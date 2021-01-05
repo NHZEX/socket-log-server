@@ -11,6 +11,7 @@ use function func\call_wrap;
 use function func\log;
 use function func\str_starts_with;
 use function sprintf;
+use function zlib_decode;
 
 class Server
 {
@@ -63,7 +64,11 @@ class Server
     public function onRequest(TcpConnection $connection, Request $request)
     {
         if ($request->method() !== 'POST'
-            || !str_starts_with($request->header('content-type', ''), 'application/json')
+            || empty($contentType = $request->header('content-type', ''))
+            || !(
+                str_starts_with($contentType, 'application/json')
+                || str_starts_with($contentType, 'application/x-compress')
+            )
         ) {
             log("receive[#{$connection->id}] invalid request: {$request->uri()}");
             $response = new Response(426);
@@ -71,7 +76,11 @@ class Server
             return;
         }
 
-        $message = $request->rawBody();
+        if ($contentType === 'application/x-compress') {
+            $message = zlib_decode($request->rawBody());
+        } else {
+            $message = $request->rawBody();
+        }
 
         $response = new Response(200);
         $connection->send($response);
