@@ -15,10 +15,10 @@ thinkphp socket-log 日志转发服务
 
 ### Docker
 
-[Docker Hub](https://hub.docker.com/r/ozxin/socket-log-server)  
 ```bash
 docker run -it socket-log-server:latest
 ```
+Docker Hub: [socket-log-server](https://hub.docker.com/r/ozxin/socket-log-server)
 
 ## 服务端口 
   - http server: 1116
