@@ -11,7 +11,6 @@ use function func\call_wrap;
 use function func\log;
 use function func\str_starts_with;
 use function sprintf;
-use function str_replace;
 
 class Server
 {
@@ -28,9 +27,12 @@ class Server
     protected $broadcastBind = [];
     protected $wsClient = [];
 
+    protected $httpAddress = '0.0.0.0:1116';
+    protected $wsAddress = '0.0.0.0:1229';
+
     public function __construct()
     {
-        $this->http = new Worker('http://0.0.0.0:1116');
+        $this->http = new Worker("http://{$this->httpAddress}");
         $this->http->name = 'logx';
         $this->http->count = 1;
         $this->http->onMessage = call_wrap([$this, 'onRequest']);
@@ -41,7 +43,7 @@ class Server
     {
         WebsocketEx::$compression = true;
 
-        $this->websocket = new Worker('websocketEx://0.0.0.0:1229');
+        $this->websocket = new Worker("websocketEx://{$this->wsAddress}");
         $this->websocket->onWebSocketConnect = call_wrap([$this, 'onHandshake']);
         $this->websocket->onConnect = call_wrap([$this, 'onWsConnect']);
         $this->websocket->onMessage = call_wrap([$this, 'onWsMessage']);
@@ -49,9 +51,11 @@ class Server
 
         $this->websocket->listen();
 
+        Worker::safeEcho(sprintf('#%s EventLoop: %s%s', $httpWorker->id, Worker::$eventLoopClass, PHP_EOL));
         Worker::safeEcho(sprintf(
-            'Websocket server(%s) listen success%s',
-            str_replace('websocketEx', 'ws', $this->websocket->getSocketName()),
+            '#%s Websocket server(ws://%s) listen success%s',
+            $httpWorker->id,
+            $this->wsAddress,
             PHP_EOL
         ));
     }

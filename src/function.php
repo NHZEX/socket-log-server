@@ -3,6 +3,7 @@
 namespace func;
 
 use Closure;
+use Workerman\Worker;
 use function date;
 use function strlen;
 use function strncmp;
@@ -22,5 +23,5 @@ function str_starts_with(string $haystack, string $needle): bool
 function log(string $msg)
 {
     $data = date('Y-m-d H:i:s');
-    echo "[{$data}] $msg\n";
+    Worker::safeEcho("[{$data}] $msg\n");
 }
