@@ -15,10 +15,29 @@ thinkphp socket-log 日志转发服务
 
 ### Docker
 
-```bash
-docker run -it ozxin/socket-log-server:latest
-```
 Docker Hub: [socket-log-server](https://hub.docker.com/r/ozxin/socket-log-server)
+
+##### cli
+```bash
+docker run \
+  -t \
+  -p 1116:1116 \
+  -p 1229:1229 \
+  ozxin/socket-log-server:latest
+```
+
+#### docker-compose
+```yaml
+version: "3"
+
+services:
+  log-server:
+    image: ozxin/socket-log-server:latest
+    restart: always
+    ports:
+      - "1116:1116"
+      - "1229:1229"
+```
 
 ## 服务端口 
   - http server: 1116
