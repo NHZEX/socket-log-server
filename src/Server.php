@@ -8,9 +8,10 @@ use Workerman\Protocols\Http\Response;
 use Workerman\Protocols\WebsocketEx;
 use Workerman\Worker;
 use function func\call_wrap;
+use function func\format_byte;
 use function func\log;
-use function func\str_starts_with;
 use function sprintf;
+use function str_starts_with;
 use function zlib_decode;
 
 class Server
@@ -78,15 +79,23 @@ class Server
 
         if ($contentType === 'application/x-compress') {
             $message = zlib_decode($request->rawBody());
+            $messageSize = sprintf('%s (compress: %s)', format_byte(strlen($message)), format_byte(strlen($request->rawBody())));
         } else {
             $message = $request->rawBody();
+            $messageSize = format_byte(strlen($message));
         }
 
         $response = new Response(200);
         $connection->send($response);
 
-        log(sprintf('receive[#%s] message: send %s byte to %s', $connection->id, strlen($message), $request->uri()));
-        $this->broadcast($message, $request->uri());
+        log(sprintf(
+            'receive[%s] message[#%s]: send %s to %s',
+            $connection->getRemoteIp(),
+            $connection->id,
+            $messageSize,
+            $request->uri()
+        ));
+        $this->broadcast($message, $request->uri(), $connection->id);
     }
 
     public function onHandshake(TcpConnection $connection, string $http_header)
@@ -94,7 +103,7 @@ class Server
         $request_uri = $_SERVER['REQUEST_URI'];
         $this->broadcastBind[$request_uri][$connection->id] = $connection->id;
         $this->wsClient[$connection->id] = $request_uri;
-        log("ws client join：{$request_uri}[{$connection->id}]");
+        log("client join：{$request_uri}[{$connection->id}]");
 
         /** @var WebsocketEx $protocol */
         $protocol = $connection->protocol;
@@ -123,10 +132,10 @@ class Server
         log("ws client disconnect：{$request_uri}[{$connection->id}]");
     }
 
-    protected function broadcast (string $data, string $uri)
+    protected function broadcast (string $data, string $uri, int $cid)
     {
         $clients = $this->broadcastBind[$uri] ?? [];
-        log("broadcast message to {$uri}, count: " . count($clients));
+        log("broadcast message[#{$cid}] to {$uri}, count: " . count($clients));
         foreach ($clients as $id) {
             /** @var TcpConnection $conn */
             $conn = $this->websocket->connections[$id];
