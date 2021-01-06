@@ -5,7 +5,7 @@ thinkphp socket-log 日志转发服务
 ## 环境需求
 
 - php >= 7.1
-- ext-zip
+- ext-zlib
 
 ## 启动服务 
 
@@ -16,7 +16,7 @@ thinkphp socket-log 日志转发服务
 ### Docker
 
 ```bash
-docker run -it socket-log-server:latest
+docker run -it ozxin/socket-log-server:latest
 ```
 Docker Hub: [socket-log-server](https://hub.docker.com/r/ozxin/socket-log-server)
 
