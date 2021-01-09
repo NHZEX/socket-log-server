@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  log-server:
+    image: ozxin/socket-log-server:latest
+    restart: always
+    network_mode: "bridge"
+    ports:
+      - "1116:1116"
+      - "1229:1229"
