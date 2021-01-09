@@ -14,9 +14,11 @@ RUN set -eux \
     && apk del --no-network .build-deps \
     && rm -rf /var/cache/apk/* \
     && php -v \
-    && php -m
+    && php -m \
+    && mkdir -p /opt/socket-log
 
-COPY ./socket-log.phar ./
+COPY ./socket-log.phar /opt/socket-log/
+WORKDIR /opt/socket-log
 
 EXPOSE 1116 1229
 
