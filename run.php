@@ -7,6 +7,8 @@ use App\Server;
 use Phar;
 use Workerman\Worker;
 use function basename;
+use function crc32;
+use function dechex;
 use function define;
 use function file_exists;
 use function getenv;
@@ -32,12 +34,13 @@ $unique_prefix = str_replace('/', '_', RUNNING_ROOT . '_' . $filename);
 $run_dir = getenv('XDG_RUNTIME_DIR') ?: '/run';
 $run_dir = is_writable($run_dir) ? $run_dir : '/tmp';
 define('RUNNING_TMP_DIR', "{$run_dir}/wm{$unique_prefix}");
+define('RUNNING_TMP_ID', "{$run_dir}/wm_" . dechex(crc32(RUNNING_TMP_DIR)));
 
-if (!file_exists(RUNNING_TMP_DIR)) {
-    mkdir(RUNNING_TMP_DIR, 0755);
+if (!file_exists(RUNNING_TMP_ID)) {
+    mkdir(RUNNING_TMP_ID, 0755);
 }
 
-Worker::$pidFile = RUNNING_TMP_DIR . '/run.pid';
+Worker::$pidFile = RUNNING_TMP_ID . '/run.pid';
 Worker::$logFile = RUNNING_ROOT . '/workerman.log';
 
 echo sprintf('App version: %s, Compile datetime: %s %s', APP_VERSION, COMPILE_DATETIME, PHP_EOL);

@@ -7,6 +7,7 @@
             "email": "auooru@outlook.com"
         }
     ],
+    "description": "",
     "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
@@ -24,6 +25,7 @@
         "symfony/polyfill-php73": "^1",
         "symfony/polyfill-php74": "^1",
         "symfony/polyfill-php80": "^1",
+        "workerman/channel": "^1.0",
         "workerman/workerman": "^4.0"
     },
     "require-dev": {
