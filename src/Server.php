@@ -104,18 +104,6 @@ class Server
         $this->broadcastBind[$request_uri][$connection->id] = $connection->id;
         $this->wsClient[$connection->id] = $request_uri;
         log("client join：{$request_uri}[{$connection->id}]");
-
-        /** @var WebsocketEx $protocol */
-        $protocol = $connection->protocol;
-
-        if ($protocol::$compression
-            && strpos($_SERVER['HTTP_SEC_WEBSOCKET_EXTENSIONS'] ?? '', 'permessage-deflate') !== false
-        ) {
-            $connection->headers = [
-                'Sec-WebSocket-Extensions: permessage-deflate; client_no_context_takeover; server_no_context_takeover'
-            ];
-        }
-
     }
 
     public function onWsConnect (TcpConnection $connection)
