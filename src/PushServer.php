@@ -31,12 +31,14 @@ class PushServer
 
     public function __construct($wsAddress)
     {
-        WebsocketEx::$compression = true;
         $this->wsAddress = $wsAddress;
 
         $this->websocket = new Worker("websocketEx://{$this->wsAddress}");
         $this->websocket->name = 'push';
         $this->websocket->count = 1;
+        /** @var WebsocketEx $protocol */
+        $protocol = $this->websocket->protocol;
+        $protocol->enableCompression = true;
         $this->websocket->onWorkerStart = function () {
             ChannelClient::connect('event');
             ChannelClient::on('broadcast', function ($data) {
