@@ -1,4 +1,4 @@
-FROM php:7.4-cli-alpine3.12
+FROM php:8.0-cli-alpine3.14
 
 RUN set -eux \
     && apk add --no-cache libevent openssl \
