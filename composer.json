@@ -22,7 +22,7 @@
         "ext-zlib": "*",
         "symfony/polyfill-php80": "^1",
         "symfony/polyfill-php81": "^1",
-        "workerman/workerman": "^4.0"
+        "workerman/workerman": "^4.1.5"
     },
     "require-dev": {
         "symfony/var-dumper": "^5"

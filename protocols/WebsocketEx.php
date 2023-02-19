@@ -26,7 +26,7 @@ class WebsocketEx extends Websocket
      * @param TcpConnection $connection
      * @return int
      */
-    public static function dealHandshake($buffer, TcpConnection $connection)
+    public static function dealHandshake($buffer, $connection)
     {
         // HTTP protocol.
         if (0 === \strpos($buffer, 'GET')) {

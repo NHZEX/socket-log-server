@@ -30,7 +30,7 @@ $filename = IN_PHAR ? basename(APP_ROOT) : basename(__FILE__);
 $unique_prefix = str_replace('/', '_', RUNNING_ROOT . '_' . $filename);
 
 $run_dir = getenv('XDG_RUNTIME_DIR') ?: '/run';
-$run_dir = is_writable($run_dir) ? $run_dir : '/tmp';
+$run_dir = \is_dir($run_dir) && is_writable($run_dir) ? $run_dir : \sys_get_temp_dir();
 define('RUNNING_TMP_DIR', "{$run_dir}/wm{$unique_prefix}");
 
 if (!file_exists(RUNNING_TMP_DIR)) {
