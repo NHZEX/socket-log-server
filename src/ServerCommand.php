@@ -24,6 +24,8 @@ class ServerCommand extends Command
         $version = $this->getApplication()->getVersion();
         $output->writeln("<info>Socket Log Server.</info>");
         $output->writeln("<info>Version: {$version}</info>");
+        $output->writeln(\sprintf('<info>PHP: %s</info>', PHP_VERSION));
+        $output->writeln(\sprintf('<info>Swoole: %s</info>', SWOOLE_VERSION));
 
         $logger = new ConsoleLogger(
             output: $output,

@@ -6,11 +6,10 @@ on:
       - 'dev/**'
     tags:
       - 'v*.**' # Push events to matching v*, i.e. v1.0, v20.15.10
-  release:
-    types:
-      - created
-      - prerelease
-#    # Sequence of patterns matched against refs/tags
+#  release:
+#    types:
+#      - created
+#      - prerelease
 
 name: Upload Release Asset
 
@@ -127,7 +126,7 @@ jobs:
     needs:
       - build-phar
       - pack-sfx
-    if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: actions/download-artifact@v3
         with:
