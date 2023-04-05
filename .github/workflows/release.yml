@@ -28,7 +28,7 @@ jobs:
       - uses: ramsey/composer-install@v2
         with:
           dependency-versions: "locked"
-          composer-options: "--optimize-autoloader --no-dev --no-suggest"
+          composer-options: "--optimize-autoloader --no-dev"
       - name: Download box
         run: |
           wget https://github.com/box-project/box/releases/download/4.3.8/box.phar
@@ -36,10 +36,10 @@ jobs:
         run: |
           composer install --prefer-dist --no-dev --no-progress
           php box.phar compile
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         name: Upload the PHAR artifact
         with:
-          name: socket-log.phar
+          name: phar-archive
           path: ./bin/socket-log-server.phar
 
   publish-phar:
@@ -49,9 +49,9 @@ jobs:
       - build-phar
     if: github.event_name == 'release'
     steps:
-      - uses: actions/download-artifact@v2
+      - uses: actions/download-artifact@v3
         with:
-          name: socket-log.phar
+          name: phar-archive
           path: .
       - name: Upload Release Asset
         uses: actions/upload-release-asset@v1
@@ -59,6 +59,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./socket-log.phar
+          asset_path: ./socket-log-server.phar
           asset_name: socket-log.phar
           asset_content_type: application/zip

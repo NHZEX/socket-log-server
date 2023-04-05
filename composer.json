@@ -13,9 +13,7 @@
         "psr-4": {
             "SocketLog\\": "src/"
         },
-        "files": [
-            "src/function.php"
-        ]
+        "files": []
     },
     "require": {
         "php": "^8.0",
