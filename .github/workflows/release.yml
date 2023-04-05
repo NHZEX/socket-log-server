@@ -1,10 +1,16 @@
 on:
   push:
+    branches:
+      - 'master'
+      - 'dev-**'
+      - 'dev/**'
+    tags:
+      - 'v*.**' # Push events to matching v*, i.e. v1.0, v20.15.10
   release:
-    types: [ created ]
+    types:
+      - created
+      - prerelease
 #    # Sequence of patterns matched against refs/tags
-#    tags:
-#      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 name: Upload Release Asset
 
@@ -107,31 +113,43 @@ jobs:
         run: |
           tar -xf  swoole-cli-*.tar.xz
           chmod +x ./swoole-cli
-          ./swoole-cli ./pack-sfx.php ./socket-log-server.phar ./socket-log-server.bin
+          ./swoole-cli ./pack-sfx.php ./socket-log-server.phar ./socket-log-linux-sfx
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: socket-log-linux-sfx
+          name: socket-log-binary
           path: |
-            socket-log-server.bin
+            socket-log-linux-sfx
 
   publish-phar:
     runs-on: ubuntu-latest
     name: Publish the PHAR
     needs:
       - build-phar
-    if: github.event_name == 'release'
+      - pack-sfx
+    if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: actions/download-artifact@v3
         with:
           name: phar-archive
           path: .
-      - name: Upload Release Asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/download-artifact@v3
         with:
-          upload_url: ${{ github.event.release.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
-          asset_path: ./socket-log-server.phar
-          asset_name: socket-log.phar
-          asset_content_type: application/zip
+          name: socket-log-binary
+          path: .
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          files: |
+            socket-log-server.phar
+            socket-log-linux-sfx
+#      - name: Upload Release Asset
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: ${{ github.event.release.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+#          asset_path: ./socket-log-server.phar
+#          asset_name: socket-log.phar
+#          asset_content_type: application/zip
