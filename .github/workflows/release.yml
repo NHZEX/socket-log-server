@@ -64,8 +64,7 @@ jobs:
       - name: Prepare & Configure
         run: |
           composer install --no-dev --optimize-autoloader
-          php prepare.php
-          php prepare.php -gd -exif -imagick -mongodb -mysqli
+          php prepare.php -gd -exif -imagick -mongodb -mysqli -mysqlnd
           chmod +x ./make.sh
           ls -lh
           ls -lh ./pool
@@ -88,6 +87,33 @@ jobs:
           name: dist-swoole-cli
           path: |
             swoole-cli-*
+
+  pack-sfx:
+    runs-on: ubuntu-latest
+    name: Pack SFX
+    needs:
+      - build-phar
+      - build-swoole-linux
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: phar-archive
+          path: .
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist-swoole-cli
+          path: .
+      - name: Pack SFX
+        run: |
+          tar -xf  swoole-cli-*.tar.xz
+          chmod +x ./swoole-cli
+          ./swoole-cli ./pack-sfx.php ./socket-log-server.phar ./socket-log-server.bin
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: socket-log-linux-sfx
+          path: |
+            socket-log-server.bin
 
   publish-phar:
     runs-on: ubuntu-latest
