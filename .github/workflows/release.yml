@@ -53,16 +53,26 @@ jobs:
           ref: 79c71bbe9a655ed7f0ab09d5d160a625779c5244
           fetch-depth: 0
           submodules: true
+      - name: Cache
+        uses: actions/cache@v2
+        env:
+          cache-name: swoole-cli-build-cache
+        with:
+          path: |
+            ./pool/lib
+          key: ${{ runner.os }}-build-lib-cache-1
       - name: Prepare & Configure
         run: |
-          git submodule update --init
-          composer install
+          composer install --no-dev --optimize-autoloader
           php prepare.php
+          php prepare.php -gd -exif -imagick -mongodb -mysqli
           chmod +x ./make.sh
+          ls -lh
+          ls -lh ./pool
       - name: Build
         uses: addnab/docker-run-action@v3
         with:
-          image: phpswoole/swoole_cli_os:1.5
+          image: phpswoole/swoole-cli-builder:1.6
           options: -v ${{ github.workspace }}:/work
           run: |
             cd /work
