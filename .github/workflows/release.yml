@@ -45,17 +45,15 @@ jobs:
   build-swoole-linux:
     runs-on: ubuntu-latest
     name: Build Swoole-Cli SFX
-    needs:
-      - build-phar
     steps:
       - uses: actions/checkout@v3
-        name: Configure
+        name: Checkout
         with:
-          repository: swoole/swoole-src
+          repository: swoole/swoole-cli
           ref: 79c71bbe9a655ed7f0ab09d5d160a625779c5244
           fetch-depth: 0
           submodules: true
-      - name: Prepare
+      - name: Prepare & Configure
         run: |
           git submodule update --init
           composer install
