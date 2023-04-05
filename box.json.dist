@@ -1,0 +1,37 @@
+{
+    "main": "main.php",
+    "output": "bin/socket-log-server.phar",
+    "check-requirements": true,
+    "directories": [
+        "src"
+    ],
+    "finder": [
+        {
+            "notName": "/LICENSE|.*\\.md|.*\\.dist|Makefile|composer\\.json|composer\\.lock/",
+            "exclude": [
+                "doc",
+                "test",
+                "test_old",
+                "tests",
+                "Tests",
+                "vendor-bin"
+            ],
+            "in": "vendor"
+        },
+        {
+            "name": "composer.json",
+            "in": "."
+        }
+    ],
+    "alias": "socket-log-server.phar",
+    "exclude-composer-files": true,
+    "exclude-dev-files": false,
+    "dump-autoload": false,
+    "compression": "NONE",
+    "compactors": [
+        "KevinGH\\Box\\Compactor\\Json",
+        "KevinGH\\Box\\Compactor\\Php"
+    ],
+    "datetime": "compile-datetime",
+    "git-tag": "app-version"
+}

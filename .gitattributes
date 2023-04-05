@@ -3,5 +3,6 @@
 /.phpunit.xml export-ignore
 /dump export-ignore
 /box.json export-ignore
+/box.json.dist export-ignore
 /scoper.inc.php export-ignore
 /Dockerfile export-ignore

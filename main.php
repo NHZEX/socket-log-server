@@ -12,9 +12,13 @@ define('RUNNING_ROOT', realpath(getcwd()));
 define('APP_ROOT', IN_PHAR ? Phar::running() : realpath(getcwd()));
 define('RUNTIME_DIR', RUNNING_ROOT . DIRECTORY_SEPARATOR . 'runtime');
 
+define('BUILD_DATETIME', '@compile-datetime@');
+define('BUILD_VERSION', '@app-version@');
+define('VERSION_TITLE', IN_PHAR ? \sprintf('%s', BUILD_VERSION) : '0.0.0');
+
 require __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
 
-$app = new Application('socket-log-server', '1.0.0');
+$app = new Application('socket-log-server', VERSION_TITLE);
 $command = new ServerCommand();
 $app->add($command);
 $app->setDefaultCommand($command->getName(), true);
