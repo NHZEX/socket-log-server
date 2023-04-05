@@ -24,14 +24,14 @@
         }
     ],
     "alias": "socket-log-server.phar",
-    "exclude-composer-files": true,
-    "exclude-dev-files": false,
-    "dump-autoload": false,
     "compression": "GZ",
     "compactors": [
         "KevinGH\\Box\\Compactor\\Json",
         "KevinGH\\Box\\Compactor\\Php"
     ],
+    "exclude-composer-files": true,
+    "exclude-dev-files": false,
+    "dump-autoload": false,
     "datetime": "compile-datetime",
     "git-tag": "app-version"
 }
