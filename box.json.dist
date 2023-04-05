@@ -27,7 +27,7 @@
     "exclude-composer-files": true,
     "exclude-dev-files": false,
     "dump-autoload": false,
-    "compression": "NONE",
+    "compression": "GZ",
     "compactors": [
         "KevinGH\\Box\\Compactor\\Json",
         "KevinGH\\Box\\Compactor\\Php"
