@@ -66,6 +66,7 @@ jobs:
           options: -v ${{ github.workspace }}:/work
           run: |
             cd /work
+            ./make.sh all-library
             ./make.sh config
             ./make.sh build
             ./bin/swoole-cli -v
@@ -76,7 +77,7 @@ jobs:
         with:
           name: dist-swoole-cli
           path: |
-            bin/*
+            swoole-cli-*
 
   publish-phar:
     runs-on: ubuntu-latest
