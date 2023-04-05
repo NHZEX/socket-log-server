@@ -42,6 +42,44 @@ jobs:
           name: phar-archive
           path: ./bin/socket-log-server.phar
 
+  build-swoole-linux:
+    runs-on: ubuntu-latest
+    name: Build Swoole-Cli SFX
+    needs:
+      - build-phar
+    steps:
+      - uses: actions/checkout@v3
+        name: Configure
+        with:
+          repository: swoole/swoole-src
+          ref: 79c71bbe9a655ed7f0ab09d5d160a625779c5244
+          fetch-depth: 0
+          submodules: true
+      - name: Prepare
+        run: |
+          git submodule update --init
+          composer install
+          php prepare.php
+          chmod +x ./make.sh
+      - name: Build
+        uses: addnab/docker-run-action@v3
+        with:
+          image: phpswoole/swoole_cli_os:1.5
+          options: -v ${{ github.workspace }}:/work
+          run: |
+            cd /work
+            ./make.sh config
+            ./make.sh build
+            ./bin/swoole-cli -v
+            ./make.sh archive
+            ls -lh
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-swoole-cli
+          path: |
+            bin/*
+
   publish-phar:
     runs-on: ubuntu-latest
     name: Publish the PHAR
