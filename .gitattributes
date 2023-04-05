@@ -1,6 +1,7 @@
 /tests export-ignore
 /.github export-ignore
 /.phpunit.xml export-ignore
+/dump export-ignore
 /box.json export-ignore
 /scoper.inc.php export-ignore
 /Dockerfile export-ignore
