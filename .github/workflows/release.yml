@@ -14,30 +14,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Setup PHP with PECL extension
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
+          php-version: '8.1'
           ini-values: phar.readonly=0
           tools: composer:v2
           coverage: none
           extensions: zip
-      - name: Get composer cache directory
-        id: composercache
-        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
-      - name: Cache vendor
-        uses: actions/cache@v2
-        env:
-          cache-name: composer-cache
+      - uses: ramsey/composer-install@v2
         with:
-          path: ${{ steps.composercache.outputs.dir }}
-          key: ${{ runner.os }}-build-${{ env.cache-name }}
+          dependency-versions: "locked"
+          composer-options: "--optimize-autoloader --no-dev --no-suggest"
       - name: Download box
         run: |
-          wget https://github.com/box-project/box/releases/download/3.14.0/box.phar
+          wget https://github.com/box-project/box/releases/download/4.3.8/box.phar
       - name: Build project # This would actually build your project, using zip for an example artifact
         run: |
           composer install --prefer-dist --no-dev --no-progress
@@ -46,7 +40,7 @@ jobs:
         name: Upload the PHAR artifact
         with:
           name: socket-log.phar
-          path: ./socket-log.phar
+          path: ./bin/socket-log-server.phar
 
   publish-phar:
     runs-on: ubuntu-latest
@@ -68,54 +62,3 @@ jobs:
           asset_path: ./socket-log.phar
           asset_name: socket-log.phar
           asset_content_type: application/zip
-
-  publish-docker:
-    runs-on: ubuntu-latest
-    name: Publish the Docker hub
-    needs:
-      - build-phar
-    if: ${{ startsWith(github.ref, 'refs/tags/') }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-        with:
-          name: socket-log.phar
-          path: .
-      - name: Docker meta
-        id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v1
-        with:
-          images: ozxin/socket-log-server # list of Docker images to use as base name for tags
-          tag-sha: false # add git short SHA as Docker tag
-          tag-semver: |
-            {{version}}
-            {{major}}.{{minor}}
-            {{major}}
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-      - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Build and push
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./Dockerfile
-          platforms: linux/amd64
-          push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.docker_meta.outputs.tags }}
-          labels: ${{ steps.docker_meta.outputs.labels }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache
