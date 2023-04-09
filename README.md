@@ -11,20 +11,42 @@ thinkphp socket-log 日志转发服务
 
 ## 启动服务 
 
-### Phar
-1. 下载 [socket-log.phar](https://github.com/NHZEX/socket-log-server/releases/latest/download/socket-log.phar)  
+### 方法1: Phar
+1. 下载最新 [socket-log.phar](https://github.com/NHZEX/socket-log-server/releases/latest/download/socket-log-server.phar)  
 2. ```php socket-log-server.phar```
 
-### Swoole-Cli
+### 方法2: Swoole-CLI SFX
+1. 下载最新 [socket-log-linux-sfx](https://github.com/NHZEX/socket-log-server/releases/latest/download/socket-log-linux-sfx)
+2. ```chmod +x socket-log-linux-sfx```
+3. ```./socket-log-linux-sfx --self```
 
-待补充
+#### 自执行传参方式举例
+```bash
+# 查构建版本号
+./socket-log-linux-sfx --self -- -V
+```
 
 ## 服务端口 
   - http server: 1116
-  - websocket: 1229 (提供兼容支持)
+  - websocket: 1229 (提供老浏览器扩展兼容支持)
 
 ## 构建`Phar`
 
 ```bash
-swoole-cli -dphar.readonly=false ./box.phar compile
+# 下载
+wget https://github.com/box-project/box/releases/download/4.3.8/box.phar
+# 构建
+php -dphar.readonly=false ./box.phar compile
+# 结果
+./bin/socket-log-server.phar
 ```
+
+## 构建 swoole-cli sfx
+
+```bash
+swoole-cli ./pack-sfx.php ./bin/socket-log-server.phar ./bin/socket-log-linux-sfx
+```
+
+## systemctl 守护
+
+待补充
