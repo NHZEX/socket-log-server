@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace SocketLog;
 
+use Dotenv\Dotenv;
 use Phar;
 use Symfony\Component\Console\Application;
 use function define;
@@ -17,6 +18,13 @@ define('BUILD_VERSION', '@app-version@');
 define('VERSION_TITLE', IN_PHAR ? \sprintf('%s', BUILD_VERSION) : '0.0.0');
 
 require __DIR__ . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+
+if (\is_file(__DIR__ . DIRECTORY_SEPARATOR . '.env')) {
+    $dotenv = Dotenv::createMutable(__DIR__);
+    $dotenv->load();
+
+    Server::verifyEnv($dotenv);
+}
 
 $app = new Application('socket-log-server', VERSION_TITLE);
 $command = new ServerCommand();

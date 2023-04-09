@@ -22,6 +22,11 @@ class ServerCommand extends Command
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $version = $this->getApplication()->getVersion();
+
+        \cli_set_process_title(
+            \sprintf('php/socket-log-server %s', $version)
+        );
+
         $output->writeln("<info>Socket Log Server.</info>");
         $output->writeln("<info>Version: {$version}</info>");
         $output->writeln(\sprintf('<info>PHP: %s</info>', PHP_VERSION));

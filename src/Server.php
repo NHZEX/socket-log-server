@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace SocketLog;
 
+use Dotenv\Dotenv;
 use Psr\Log\LoggerInterface;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
@@ -23,6 +24,16 @@ class Server
     private array                    $broadcastMap = [];
     private array                    $clientIdMap  = [];
 
+    private array                    $config = [
+        'worker_num'               => 1,
+        'daemonize'                => false,
+        'heartbeat_check_interval' => 60,
+        'heartbeat_idle_time'      => 300,
+        'pid_file'                 => RUNTIME_DIR . '/server.pid',
+        'http_compression'         => true,
+        'websocket_compression'    => true,
+    ];
+
     private array                    $allowContentTypes = [
         'application/json',
         'application/x-compress',
@@ -31,13 +42,47 @@ class Server
     public function __construct(
         protected LoggerInterface $logger,
     ) {
+        $this->resolveConfig();
         $this->create();
+    }
+
+    public static function verifyEnv(Dotenv $dotenv): void
+    {
+        $dotenv
+            ->ifPresent('SL_SERVER_LISTEN')
+            ->assert(
+                fn ($val) => test_address_and_port($val),
+                \sprintf('(%s) address is invalid', $_ENV['SL_SERVER_LISTEN'] ?? '')
+            );
+
+        $dotenv
+            ->ifPresent('SL_SERVER_BC_LISTEN')
+            ->assert(function (string $val): bool {
+                if ('false' === $val)  {
+                    return true;
+                }
+                return test_address_and_port($val);
+            }, \sprintf('(%s) address is invalid', $_ENV['SL_SERVER_BC_LISTEN'] ?? ''));
+
+        $dotenv->ifPresent('SL_WORKER_NUM')
+            ->isInteger();
+    }
+
+    protected function resolveConfig(): void
+    {
+        $this->listen = $_ENV['SL_SERVER_LISTEN'] ?? $this->listen;
+        $this->listenWS = $_ENV['SL_SERVER_BC_LISTEN'] ?? $this->listenWS;
     }
 
     protected function create(): void
     {
-        $listen = \explode(':', $this->listen);
-        $server = new \Swoole\WebSocket\Server($listen[0] ?: '127.0.0.1', (int) ($listen[1] ?? 1116), SWOOLE_BASE);
+        $listen = parse_str_ip_and_port($this->listen);
+        $server = new \Swoole\WebSocket\Server(
+            $listen[0] ?: '127.0.0.1',
+            (int) ($listen[1] ?? 1116),
+            SWOOLE_BASE,
+            SWOOLE_SOCK_TCP | SWOOLE_SOCK_TCP6,
+        );
 
         $this->logger->info(\sprintf(
             'listen: %s://%s',
@@ -50,17 +95,13 @@ class Server
             $this->listen,
         ));
 
-        $server->set([
-            'worker_num'               => 1,
-            'daemonize'                => false,
-            'heartbeat_check_interval' => 60,
-            'heartbeat_idle_time'      => 300,
-            'pid_file'                 => RUNTIME_DIR . '/server.pid',
-            'http_compression'         => true,
-            'websocket_compression'    => true,
-        ]);
-        $listen = \explode(':', $this->listenWS);
-        $server->addlistener($listen[0] ?: '127.0.0.1', (int) ($listen[1] ?? 1229), $server->mode);
+        $server->set($this->config);
+        $listen = parse_str_ip_and_port($this->listenWS);
+        $server->addlistener(
+            $listen[0] ?: '127.0.0.1',
+            (int) ($listen[1] ?? 1229),
+            $server->mode,
+        );
         $this->logger->info(\sprintf(
             'listen: %s://%s',
             'ws',
