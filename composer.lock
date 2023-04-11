@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "92b4fe08d798b86f09e408b90a527a69",
+    "content-hash": "d5c85da0ceeb8ecd00270a53b67bbb78",
     "packages": [
         {
             "name": "graham-campbell/result-type",
@@ -198,30 +198,30 @@
         },
         {
             "name": "psr/log",
-            "version": "1.1.4",
+            "version": "3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-fig/log.git",
-                "reference": "d49695b909c3b7628b6289db5479a1c204601f11"
+                "reference": "fe5ea303b0887d5caefd3d431c3e61ad47037001"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/d49695b909c3b7628b6289db5479a1c204601f11",
-                "reference": "d49695b909c3b7628b6289db5479a1c204601f11",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/fe5ea303b0887d5caefd3d431c3e61ad47037001",
+                "reference": "fe5ea303b0887d5caefd3d431c3e61ad47037001",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.0"
+                "php": ">=8.0.0"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.1.x-dev"
+                    "dev-master": "3.x-dev"
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "Psr\\Log\\": "Psr/Log/"
+                    "Psr\\Log\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -242,9 +242,9 @@
                 "psr-3"
             ],
             "support": {
-                "source": "https://github.com/php-fig/log/tree/1.1.4"
+                "source": "https://github.com/php-fig/log/tree/3.0.0"
             },
-            "time": "2021-05-03T11:20:27+00:00"
+            "time": "2021-07-14T16:46:02+00:00"
         },
         {
             "name": "symfony/console",
@@ -831,16 +831,16 @@
         },
         {
             "name": "zxin/utils",
-            "version": "v2.4.1",
+            "version": "v2.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/NHZEX/php-utils.git",
-                "reference": "6ad6df0a8ebf2c7393a1793ab1033390da645eb9"
+                "reference": "71a169abd24efa140ee1c40089d9150bff10bc18"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/NHZEX/php-utils/zipball/6ad6df0a8ebf2c7393a1793ab1033390da645eb9",
-                "reference": "6ad6df0a8ebf2c7393a1793ab1033390da645eb9",
+                "url": "https://api.github.com/repos/NHZEX/php-utils/zipball/71a169abd24efa140ee1c40089d9150bff10bc18",
+                "reference": "71a169abd24efa140ee1c40089d9150bff10bc18",
                 "shasum": ""
             },
             "require": {
@@ -891,9 +891,9 @@
             "description": "util tools",
             "support": {
                 "issues": "https://github.com/NHZEX/php-utils/issues",
-                "source": "https://github.com/NHZEX/php-utils/tree/v2.4.1"
+                "source": "https://github.com/NHZEX/php-utils/tree/v2.4.2"
             },
-            "time": "2022-11-10T11:32:02+00:00"
+            "time": "2023-04-09T06:04:23+00:00"
         }
     ],
     "packages-dev": [
@@ -936,7 +936,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.0",
+        "php": "^8.1",
         "ext-ctype": "*",
         "ext-mbstring": "*",
         "ext-zlib": "*"
