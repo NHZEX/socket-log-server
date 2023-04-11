@@ -39,6 +39,8 @@ class Server
         'application/x-compress',
     ];
 
+    private array                    $allowClient = [];
+
     public function __construct(
         protected LoggerInterface $logger,
     ) {
@@ -72,6 +74,10 @@ class Server
     {
         $this->listen = $_ENV['SL_SERVER_LISTEN'] ?? $this->listen;
         $this->listenWS = $_ENV['SL_SERVER_BC_LISTEN'] ?? $this->listenWS;
+
+        if (!empty($_ENV['SL_ALLOW_CLIENT_LIST'])) {
+            $this->allowClient = \array_filter(\array_map('\trim', \explode("\n", $_ENV['SL_ALLOW_CLIENT_LIST'])));
+        }
     }
 
     protected function create(): void
@@ -113,7 +119,7 @@ class Server
         $this->initEvent();
     }
 
-    protected function initEvent()
+    protected function initEvent(): void
     {
         $this->server->on('workerStart', function (\Swoole\Server $server, int $workerId) {
             $this->logger->info("workerStart #{$workerId}");
@@ -157,6 +163,11 @@ class Server
 
         if (empty($clientId) || \strlen($clientId) > 32) {
             $response->status(400, 'Bad Request');
+            $response->end();
+            return;
+        }
+        if (!$this->checkClientIsAllow($clientId)) {
+            $response->status(401, 'Unauthorized');
             $response->end();
             return;
         }
@@ -213,6 +224,15 @@ class Server
         $this->logger->info("client leave: {$clientId}[#{$fd}]");
     }
 
+    private function checkClientIsAllow(string $clientId): bool
+    {
+        if (empty($this->allowClient)) {
+            return true;
+        }
+
+        return \array_reduce($this->allowClient, fn($carry, $item) => $carry || \fnmatch($item, $clientId), false);
+    }
+
     private function onRequest(Request $request, Response $response): void
     {
         $path = $request->server['request_uri'];
@@ -233,6 +253,13 @@ class Server
         ) {
             $this->logger->warning("receive[#{$request->fd}] invalid request: {$path}");
             $response->status(426, 'Not Acceptable');
+            $response->end();
+            return;
+        }
+
+        if (!$this->checkClientIsAllow($clientId)) {
+            $this->logger->warning("receive[#{$request->fd}] unauthorized request: {$path}");
+            $response->status(401, 'Unauthorized');
             $response->end();
             return;
         }
