@@ -50,49 +50,25 @@ jobs:
 
   build-swoole-linux:
     runs-on: ubuntu-latest
-    name: Build Swoole-Cli SFX
+    name: Down Swoole-Cli SFX
     steps:
-      - uses: actions/checkout@v3
-        name: Checkout
-        with:
-          repository: swoole/swoole-cli
-          ref: 79c71bbe9a655ed7f0ab09d5d160a625779c5244
-          fetch-depth: 0
-          submodules: true
-      - name: Cache
-        uses: actions/cache@v2
-        env:
-          cache-name: swoole-cli-build-cache
-        with:
-          path: |
-            ./pool/lib
-          key: ${{ runner.os }}-build-lib-cache-1
-      - name: Prepare & Configure
+      - name: Prepare
         run: |
-          composer install --no-dev --optimize-autoloader
-          php prepare.php -gd -exif -imagick -mongodb -mysqli -mysqlnd
-          chmod +x ./make.sh
-          ls -lh
-          ls -lh ./pool
-      - name: Build
-        uses: addnab/docker-run-action@v3
-        with:
-          image: phpswoole/swoole-cli-builder:1.6
-          options: -v ${{ github.workspace }}:/work
-          run: |
-            cd /work
-            ./make.sh all-library
-            ./make.sh config
-            ./make.sh build
-            ./bin/swoole-cli -v
-            ./make.sh archive
-            ls -lh
+          curl -O https://wenda-1252906962.file.myqcloud.com/dist/swoole-cli-v5.1.0-linux-x64.tar.xz
+          tar -xvf swoole-cli-*.tar.xz
+          ls -lh .
+      - name: Test
+        run: |
+          ./swoole-cli -v
+          ./swoole-cli -m
+          ./swoole-cli --ri swoole
       - name: Archive production artifacts
         uses: actions/upload-artifact@v3
         with:
           name: dist-swoole-cli
           path: |
-            swoole-cli-*
+            swoole-cli
+            pack-sfx.php
 
   pack-sfx:
     runs-on: ubuntu-latest
@@ -111,7 +87,6 @@ jobs:
           path: .
       - name: Pack SFX
         run: |
-          tar -xf  swoole-cli-*.tar.xz
           chmod +x ./swoole-cli
           ./swoole-cli ./pack-sfx.php ./socket-log-server.phar ./socket-log-linux-sfx
           ./socket-log-linux-sfx --self -- --version
