@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Setup PHP with PECL extension
@@ -50,10 +50,10 @@ jobs:
 
   build-swoole-linux:
     runs-on: ubuntu-latest
-    name: Down Swoole-Cli SFX
+    name: Prepare Swoole-Cli
     steps:
       # https://www.swoole.com/download
-      - name: Prepare
+      - name: Download
         run: |
           curl -O https://wenda-1252906962.file.myqcloud.com/dist/swoole-cli-v5.1.0-linux-x64.tar.xz
           tar -xvf swoole-cli-*.tar.xz
@@ -123,3 +123,40 @@ jobs:
           files: |
             socket-log-server.phar
             socket-log-linux-sfx
+
+  publish-image:
+    name: Publish the Image
+    runs-on: ubuntu-latest
+    needs:
+      - build-phar
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: actions/download-artifact@v3
+        with:
+          name: phar-archive
+          path: .
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/socket-log-server
+          tags: |
+            type=ref,enable=true,priority=600,prefix=,suffix=,event=branch
+            type=ref,enable=true,priority=600,prefix=,suffix=,event=tag
+      - name: Log in to Github
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: linux/amd64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
