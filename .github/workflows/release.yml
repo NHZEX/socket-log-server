@@ -36,7 +36,7 @@ jobs:
           composer-options: "--optimize-autoloader --no-dev"
       - name: Download box
         run: |
-          wget https://github.com/box-project/box/releases/download/4.3.8/box.phar
+          wget https://github.com/box-project/box/releases/download/4.5.1/box.phar
       - name: Build project # This would actually build your project, using zip for an example artifact
         run: |
           composer install --prefer-dist --no-dev --no-progress
@@ -52,6 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Down Swoole-Cli SFX
     steps:
+      # https://www.swoole.com/download
       - name: Prepare
         run: |
           curl -O https://wenda-1252906962.file.myqcloud.com/dist/swoole-cli-v5.1.0-linux-x64.tar.xz
@@ -60,6 +61,7 @@ jobs:
       - name: Test
         run: |
           ./swoole-cli -v
+          ./swoole-cli -r "echo PHP_VERSION, PHP_EOL;"
           ./swoole-cli -m
           ./swoole-cli --ri swoole
       - name: Archive production artifacts
