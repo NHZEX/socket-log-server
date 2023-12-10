@@ -8,4 +8,4 @@ WORKDIR /opt/socket-log
 
 EXPOSE 1116 1229
 
-CMD ["php", "socket-log-server.phar", "start"]
+CMD ["php", "socket-log-server.phar"]
