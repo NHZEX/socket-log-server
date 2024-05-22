@@ -54,8 +54,10 @@ jobs:
     steps:
       # https://www.swoole.com/download
       - name: Download
+        # https://github.com/swoole/swoole-cli/releases/download/v5.1.2.0/swoole-cli-v5.1.2-linux-x64.tar.xz
+        # https://wenda-1252906962.file.myqcloud.com/dist/swoole-cli-v5.1.1-linux-x64.tar.xz
         run: |
-          curl -O https://github.com/swoole/swoole-cli/releases/download/v5.1.2.0/swoole-cli-v5.1.2-linux-x64.tar.xz
+          curl -v -O https://github.com/swoole/swoole-cli/releases/download/v5.1.2.0/swoole-cli-v5.1.2-linux-x64.tar.xz
           tar -xvf swoole-cli-*.tar.xz
           ls -lh .
       - name: Test
