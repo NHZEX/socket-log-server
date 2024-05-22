@@ -161,7 +161,7 @@ class Server
 
         $clientId = \trim($path, '/');
 
-        if (empty($clientId) || \strlen($clientId) > 32) {
+        if (empty($clientId) || \strlen($clientId) > 128) {
             $response->status(400, 'Bad Request');
             $response->end();
             return;
@@ -169,6 +169,7 @@ class Server
         if (!$this->checkClientIsAllow($clientId)) {
             $response->status(401, 'Unauthorized');
             $response->end();
+            $this->logger->warning("client refuse: {$clientId}[#{$request->fd}]");
             return;
         }
         // websocket握手连接算法验证
@@ -248,7 +249,7 @@ class Server
         if ($method !== 'POST'
             || empty($contentType)
             || empty($clientId)
-            || \strlen($clientId) > 32
+            || \strlen($clientId) > 128
             || !\in_array($contentType, $this->allowContentTypes, true)
         ) {
             $this->logger->warning("receive[#{$request->fd}] invalid request: {$path}");
