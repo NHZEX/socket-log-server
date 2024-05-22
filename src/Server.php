@@ -7,6 +7,7 @@ use Dotenv\Dotenv;
 use Psr\Log\LoggerInterface;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
+use Swoole\WebSocket\Frame;
 use function Zxin\Util\format_byte;
 
 class Server
@@ -40,6 +41,9 @@ class Server
     ];
 
     private array                    $allowClient = [];
+
+    const PING_CONTENT = "\x05\x22\x09";
+    const PONG_CONTENT = "\x05\x22\x0A";
 
     public function __construct(
         protected LoggerInterface $logger,
@@ -137,14 +141,7 @@ class Server
 //        $this->server->on('open', function (\Swoole\WebSocket\Server $server, \Swoole\Http\Request $request) {
 //        });
 
-        $this->server->on('message', function (\Swoole\WebSocket\Server $server, \Swoole\WebSocket\Frame $frame) {
-            $this->server->push(
-                $frame->fd,
-                'pong: ' . \substr($frame->data, 0, 32) ?: 'null',
-                WEBSOCKET_OPCODE_TEXT,
-                SWOOLE_WEBSOCKET_FLAG_FIN | SWOOLE_WEBSOCKET_FLAG_COMPRESS,
-            );
-        });
+        $this->server->on('message', $this->onMessage(...));
 
         $this->server->on('disconnect', function (\Swoole\WebSocket\Server $server, int $fd) {
             $this->clientLeave($fd);
@@ -205,6 +202,20 @@ class Server
         $this->clientJoin($clientId, $request->fd);
         $response->status(101);
         $response->end();
+    }
+
+    private function onMessage(\Swoole\WebSocket\Server $server, Frame $frame): void
+    {
+        if (SWOOLE_WEBSOCKET_OPCODE_BINARY === $frame->opcode) {
+            if (self::PING_CONTENT === substr($frame->data, 0, 3)) {
+                $this->server->push(
+                    $frame->fd,
+                    self::PONG_CONTENT,
+                    SWOOLE_WEBSOCKET_OPCODE_BINARY,
+                    SWOOLE_WEBSOCKET_FLAG_FIN,
+                );
+            }
+        }
     }
 
     private function clientJoin(string $clientId, int $fd): void
