@@ -38,12 +38,16 @@ class Server
     private array                    $allowContentTypes = [
         'application/json',
         'application/x-compress',
+        'application/x-e2e-compress+json',
+        'application/x-e2e-json',
     ];
 
     private array                    $allowClient = [];
 
-    const PING_CONTENT = "\x05\x22\x09";
-    const PONG_CONTENT = "\x05\x22\x0A";
+    const PING_CONTENT    = "\x05\x22\x09";
+    const PONG_CONTENT    = "\x05\x22\x0A";
+    const FLAG_COMPRESS   = 0x0001;
+    const FLAG_ENCRYPTION = 0x0002;
 
     public function __construct(
         protected LoggerInterface $logger,
@@ -278,9 +282,13 @@ class Server
 
         $rawBody = $request->getContent();
 
-        if ('application/x-compress' === $contentType) {
+        $isCompress   = 'application/x-compress' === $contentType || 'application/x-e2e-compress+json' === $contentType;
+        $isEncryption = 'application/x-e2e-json' === $contentType || 'application/x-e2e-compress+json' === $contentType;
+
+        if ($isCompress && !$isEncryption) {
             $message = zlib_decode($rawBody);
             $messageSize = sprintf('%s(compress: %s)', format_byte(strlen($message)), format_byte(strlen($rawBody)));
+            $isCompress = false;
         } else {
             $message = $rawBody;
             $messageSize = format_byte(strlen($message));
@@ -299,10 +307,10 @@ class Server
             )
         );
 
-        $this->broadcast($clientId, $message);
+        $this->broadcast($clientId, $message, $isCompress, $isEncryption);
     }
 
-    private function broadcast(string $clientId, string $message): void
+    private function broadcast(string $clientId, string $message, bool $isCompress, bool $isEncryption): void
     {
         $fds = $this->broadcastMap[$clientId] ?? [];
         if (empty($fds)) {
@@ -310,15 +318,28 @@ class Server
         }
         $total = \count($fds);
         $i = 0;
+
+        $frameFlags = $isCompress
+            ? SWOOLE_WEBSOCKET_FLAG_FIN
+            : SWOOLE_WEBSOCKET_FLAG_FIN | SWOOLE_WEBSOCKET_FLAG_COMPRESS;
+
+        $opcode = $isEncryption ? WEBSOCKET_OPCODE_BINARY : WEBSOCKET_OPCODE_TEXT;
+
+        if (WEBSOCKET_OPCODE_BINARY === $opcode) {
+            $_f = 0;
+            if ($isCompress) {
+                $_f |= self::FLAG_COMPRESS;
+            }
+            if ($isEncryption) {
+                $_f |= self::FLAG_ENCRYPTION;
+            }
+            $message = "\x05\x21" . pack('n', $_f) . $message;
+        }
+
         foreach ($fds as $fd) {
             $i++;
             $this->logger->debug("broadcast message to #{$fd}[{$i}/$total].");
-            $this->server->push(
-                $fd,
-                $message,
-                WEBSOCKET_OPCODE_TEXT,
-                SWOOLE_WEBSOCKET_FLAG_FIN | SWOOLE_WEBSOCKET_FLAG_COMPRESS,
-            );
+            $this->server->push($fd, $message, $opcode, $frameFlags);
         }
     }
 
