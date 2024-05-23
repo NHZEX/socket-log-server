@@ -259,7 +259,13 @@ class Server
         $contentType = \explode(';', $contentType)[0];
         $contentType = \trim($contentType);
 
-        $clientId = \trim($path, '/');
+        if (isset($header['x-socket-log-clientid'])) {
+            $clientId = \trim($header['x-socket-log-clientid']);
+        } elseif (isset($request->get['clientId'])) {
+            $clientId = \trim($request->get['clientId']);
+        } else {
+            $clientId = \trim($path, '/');
+        }
 
         if ($method !== 'POST'
             || empty($contentType)
@@ -267,7 +273,7 @@ class Server
             || \strlen($clientId) > 128
             || !\in_array($contentType, $this->allowContentTypes, true)
         ) {
-            $this->logger->warning("receive[#{$request->fd}] invalid request: {$path}");
+            $this->logger->warning("receive[#{$request->fd}] invalid request: " . ($path === $clientId ? $clientId : $path));
             $response->status(426, 'Not Acceptable');
             $response->end();
             return;
