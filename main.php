@@ -26,6 +26,10 @@ if (\is_file(__DIR__ . DIRECTORY_SEPARATOR . '.env')) {
     Server::verifyEnv($dotenv);
 }
 
+if (!file_exists(RUNTIME_DIR)) {
+    @mkdir(RUNTIME_DIR, 0755, true);
+}
+
 $app = new Application('socket-log-server', VERSION_TITLE);
 $command = new ServerCommand();
 $app->add($command);
