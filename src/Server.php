@@ -321,9 +321,11 @@ class Server
 
         $this->logger->info(
             \sprintf(
-                'receive[#%s] message %s, broadcast to %s [%s], total %d.',
+                'receive[#%s] message %s (c:%s,e:%s), broadcast to %s [%s], total %d.',
                 $request->fd,
                 $messageSize,
+                $isCompress ? 'y' : 'n',
+                $isEncryption ? 'y' : 'n',
                 $clientId,
                 $flag,
                 \count($this->broadcastMap[$clientId] ?? []),
