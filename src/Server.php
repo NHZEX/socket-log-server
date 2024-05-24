@@ -156,11 +156,33 @@ class Server
         });
     }
 
-    private function clientHandshake(Request $request, Response $response): void
+    private function resolveClientId(Request $request): array
     {
         $path = $request->server['request_uri'];
+        $header = $request->header;
+        $query = $request->get;
 
-        $clientId = \trim($path, '/');
+        if (isset($query['clientId'])) {
+            $clientId = \trim($query['clientId']);
+            $flag = 'qs';
+        } elseif (isset($header['x-socket-log-clientid'])) {
+            $clientId = \trim($header['x-socket-log-clientid']);
+            $flag = 'header';
+        } else {
+            $clientId = \trim($path, '/');
+            $flag = 'path';
+            if (str_contains($clientId, '/')) {
+                $clientId = substr($clientId, strrpos($clientId, '/') - 1);
+                $flag = 'path-fix';
+            }
+        }
+
+        return [$clientId, $flag];
+    }
+
+    private function clientHandshake(Request $request, Response $response): void
+    {
+        [$clientId, $flag] = $this->resolveClientId($request);
 
         if (empty($clientId) || \strlen($clientId) > 128) {
             $response->status(400, 'Bad Request');
@@ -170,7 +192,7 @@ class Server
         if (!$this->checkClientIsAllow($clientId)) {
             $response->status(401, 'Unauthorized');
             $response->end();
-            $this->logger->warning("client refuse: {$clientId}[#{$request->fd}]");
+            $this->logger->warning("client refuse: {$clientId}[#{$request->fd}][{$flag}]");
             return;
         }
         // websocket握手连接算法验证
@@ -259,13 +281,7 @@ class Server
         $contentType = \explode(';', $contentType)[0];
         $contentType = \trim($contentType);
 
-        if (isset($header['x-socket-log-clientid'])) {
-            $clientId = \trim($header['x-socket-log-clientid']);
-        } elseif (isset($request->get['clientId'])) {
-            $clientId = \trim($request->get['clientId']);
-        } else {
-            $clientId = \trim($path, '/');
-        }
+        [$clientId, $flag] = $this->resolveClientId($request);
 
         if ($method !== 'POST'
             || empty($contentType)
@@ -273,14 +289,14 @@ class Server
             || \strlen($clientId) > 128
             || !\in_array($contentType, $this->allowContentTypes, true)
         ) {
-            $this->logger->warning("receive[#{$request->fd}] invalid request: " . ($path === $clientId ? $clientId : $path));
+            $this->logger->warning("receive[#{$request->fd}] invalid request: " . ($path === $clientId ? $clientId : $path)) . " [{$flag}]";
             $response->status(426, 'Not Acceptable');
             $response->end();
             return;
         }
 
         if (!$this->checkClientIsAllow($clientId)) {
-            $this->logger->warning("receive[#{$request->fd}] unauthorized request: {$path}");
+            $this->logger->warning("receive[#{$request->fd}] unauthorized request: {$path} [{$flag}]");
             $response->status(401, 'Unauthorized');
             $response->end();
             return;
@@ -305,10 +321,11 @@ class Server
 
         $this->logger->info(
             \sprintf(
-                'receive[#%s] message %s, broadcast to %s, total %d.',
+                'receive[#%s] message %s, broadcast to %s [%s], total %d.',
                 $request->fd,
                 $messageSize,
                 $clientId,
+                $flag,
                 \count($this->broadcastMap[$clientId] ?? []),
             )
         );
