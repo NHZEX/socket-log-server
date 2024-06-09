@@ -165,6 +165,9 @@ class Server
         if (isset($query['clientId'])) {
             $clientId = \trim($query['clientId']);
             $flag = 'qs';
+        } elseif (isset($header['x-clientid'])) {
+            $clientId = \trim($header['x-clientid']);
+            $flag = 'header';
         } elseif (isset($header['x-socket-log-clientid'])) {
             $clientId = \trim($header['x-socket-log-clientid']);
             $flag = 'header';
