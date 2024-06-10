@@ -44,10 +44,12 @@ class Server
 
     private array                    $allowClient = [];
 
+    const BIN_MSG_HEADER  = "\x05\x21";
     const PING_CONTENT    = "\x05\x22\x09";
     const PONG_CONTENT    = "\x05\x22\x0A";
     const FLAG_COMPRESS   = 0x0001;
     const FLAG_ENCRYPTION = 0x0002;
+    const FLAG_USE_E2E_ID = 0x0004;
 
     public function __construct(
         protected LoggerInterface $logger,
@@ -319,6 +321,8 @@ class Server
             $messageSize = format_byte(strlen($message));
         }
 
+        $e2eId = $isEncryption ? ($header['x-e2e-id'] ?? null) : null;
+
         $response->status(200, 'OK');
         $response->end();
 
@@ -335,10 +339,10 @@ class Server
             )
         );
 
-        $this->broadcast($clientId, $message, $isCompress, $isEncryption);
+        $this->broadcast($clientId, $message, $isCompress, $isEncryption, $e2eId);
     }
 
-    private function broadcast(string $clientId, string $message, bool $isCompress, bool $isEncryption): void
+    private function broadcast(string $clientId, string $message, bool $isCompress, bool $isEncryption, ?string $e2eId): void
     {
         $fds = $this->broadcastMap[$clientId] ?? [];
         if (empty($fds)) {
@@ -361,7 +365,12 @@ class Server
             if ($isEncryption) {
                 $_f |= self::FLAG_ENCRYPTION;
             }
-            $message = "\x05\x21" . pack('n', $_f) . $message;
+            if ($e2eId !== null) {
+                $_f |= self::FLAG_USE_E2E_ID;
+                $message = self::BIN_MSG_HEADER . pack('nC', $_f, strlen($e2eId)) . $e2eId . $message;
+            } else {
+                $message = self::BIN_MSG_HEADER . pack('n', $_f) . $message;
+            }
         }
 
         foreach ($fds as $fd) {
