@@ -49,4 +49,26 @@ swoole-cli ./pack-sfx.php ./bin/socket-log-server.phar ./bin/socket-log-linux-sf
 
 ## systemctl 守护
 
-待补充
+使用 swoole-cli sfx 二进制包
+
+```ini
+[Unit]
+Description=socket-log
+After=network.target syslog.target
+
+[Service]
+Type=simple
+LimitNOFILE=655350
+ExecStart=/opt/socket-log/socket-log-linux-sfx --self
+ExecReload=/bin/kill -USR1 $MAINPID
+Restart=always
+
+[Install]
+WantedBy=multi-user.target graphical.target
+```
+
+## test
+
+```bash
+swoole-cli-5 -dopcache.enable_cli=on -dopcache.jit_buffer_size=64M main.php -q
+```
