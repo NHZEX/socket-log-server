@@ -367,7 +367,7 @@ class Server
             }
             if ($e2eId !== null) {
                 $_f |= self::FLAG_USE_E2E_ID;
-                $message = self::BIN_MSG_HEADER . pack('nC', $_f, strlen($e2eId)) . $e2eId . $message;
+                $message = self::BIN_MSG_HEADER . pack('nC', $_f, strlen($e2eId)) . substr($e2eId, 0, 127) . $message;
             } else {
                 $message = self::BIN_MSG_HEADER . pack('n', $_f) . $message;
             }
