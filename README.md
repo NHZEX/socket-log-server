@@ -20,16 +20,16 @@ thinkphp socket-log 日志转发服务
 2. ```chmod +x socket-log-linux-sfx```
 3. ```./socket-log-linux-sfx --self```
 
-### 方式3: Docker（需要网络代理）
-
-```shell
-docker pull ghcr.io/nhzex/socket-log-server:latest
-```
-
 #### 自执行传参方式举例
 ```bash
 # 查构建版本号
 ./socket-log-linux-sfx --self -- -V
+```
+
+### 方法3: Docker（需要网络代理）
+
+```shell
+docker pull ghcr.io/nhzex/socket-log-server:latest
 ```
 
 ## 服务端口 
@@ -41,7 +41,7 @@ docker pull ghcr.io/nhzex/socket-log-server:latest
 ```dotenv
 # 工作进程数量，默认1就行，没有调大的价值
 SL_WORKER_NUM=1
-# 主端口监听，支持ipv6
+# 主端口监听，支持ipv6（http+ws双协议。不区分客户端连入）
 SL_SERVER_LISTEN=[::]:1116
 # 兼容老客户端的独立端口，默认启用，后续会弃用
 SL_SERVER_BC_LISTEN=0.0.0.0:1229
@@ -53,6 +53,10 @@ test*
 sl*
 "
 ```
+
+## 公网使用建议
+
+建议套`nginx`代理，反代走`https`,`wss`。
 
 ## 自行构建`Phar`
 
