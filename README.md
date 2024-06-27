@@ -20,6 +20,12 @@ thinkphp socket-log 日志转发服务
 2. ```chmod +x socket-log-linux-sfx```
 3. ```./socket-log-linux-sfx --self```
 
+### 方式3: Docker（需要网络代理）
+
+```shell
+docker pull ghcr.io/nhzex/socket-log-server:latest
+```
+
 #### 自执行传参方式举例
 ```bash
 # 查构建版本号
@@ -30,7 +36,25 @@ thinkphp socket-log 日志转发服务
   - http server: 1116
   - websocket: 1229 (提供老浏览器扩展兼容支持)
 
-## 构建`Phar`
+## 配置使用环境变量或`.env`
+
+```dotenv
+# 工作进程数量，默认1就行，没有调大的价值
+SL_WORKER_NUM=1
+# 主端口监听，支持ipv6
+SL_SERVER_LISTEN=[::]:1116
+# 兼容老客户端的独立端口，默认启用，后续会弃用
+SL_SERVER_BC_LISTEN=0.0.0.0:1229
+# 允许中转连入的客户端ID白名单，为空则不启用
+# 匹配语法参考php函数`fnmatch`：https://www.php.net/manual/en/function.fnmatch.php
+SL_ALLOW_CLIENT_LIST="
+debug?
+test*
+sl*
+"
+```
+
+## 自行构建`Phar`
 
 ```bash
 # 下载
@@ -65,10 +89,4 @@ Restart=always
 
 [Install]
 WantedBy=multi-user.target graphical.target
-```
-
-## test
-
-```bash
-swoole-cli-5 -dopcache.enable_cli=on -dopcache.jit_buffer_size=64M main.php -q
 ```
