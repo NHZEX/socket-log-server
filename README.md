@@ -46,7 +46,7 @@ SL_SERVER_LISTEN=[::]:1116
 # 兼容老客户端的独立端口，默认启用，后续会弃用
 SL_SERVER_BC_LISTEN=0.0.0.0:1229
 # 监听unix socket 权限设置，需要开启才生效
-SL_LISTEN_UNIX_SOCK_MODE=0755
+SL_LISTEN_UNIX_SOCK_CHMOD=0755
 SL_LISTEN_UNIX_SOCK_USER=www-data
 SL_LISTEN_UNIX_SOCK_GROUP=www-data
 # 允许中转连入的客户端ID白名单，为空则不启用
