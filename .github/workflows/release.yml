@@ -30,7 +30,7 @@ jobs:
           tools: composer:v2
           coverage: none
           extensions: zip
-      - uses: ramsey/composer-install@v2
+      - uses: ramsey/composer-install@v3
         with:
           dependency-versions: "locked"
           composer-options: "--optimize-autoloader --no-dev"
@@ -42,7 +42,7 @@ jobs:
           composer install --prefer-dist --no-dev --no-progress
           php box.phar compile
           ./bin/socket-log-server.phar --version
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         name: Upload the PHAR artifact
         with:
           name: phar-archive
@@ -65,7 +65,7 @@ jobs:
           ./swoole-cli -m
           ./swoole-cli --ri swoole
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dist-swoole-cli
           path: |
@@ -79,11 +79,11 @@ jobs:
       - build-phar
       - build-swoole-linux
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: phar-archive
           path: .
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: dist-swoole-cli
           path: .
@@ -93,7 +93,7 @@ jobs:
           ./swoole-cli ./pack-sfx.php ./socket-log-server.phar ./socket-log-linux-sfx
           ./socket-log-linux-sfx --self -- --version
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: socket-log-binary
           path: |
@@ -107,16 +107,16 @@ jobs:
       - pack-sfx
     if: startsWith(github.ref, 'refs/tags/')
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: phar-archive
           path: .
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: socket-log-binary
           path: .
       - name: Upload Release Asset
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           draft: true
           generate_release_notes: true
@@ -132,7 +132,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: phar-archive
           path: .
