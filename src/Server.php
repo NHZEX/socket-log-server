@@ -92,41 +92,70 @@ class Server
 
     protected function create(): void
     {
-        $listen = parse_str_ip_and_port($this->listen);
+        $listen = parse_str_ip_and_port($this->listen, 1116);
+        if ($listen[2] ?? false) {
+            $sockType = SWOOLE_UNIX_STREAM;
+        } else {
+            $sockType = SWOOLE_SOCK_TCP | SWOOLE_SOCK_TCP6;
+        }
         $server = new \Swoole\WebSocket\Server(
             $listen[0] ?: '127.0.0.1',
-            (int) ($listen[1] ?? 1116),
+            (int) $listen[1],
             SWOOLE_BASE,
-            SWOOLE_SOCK_TCP | SWOOLE_SOCK_TCP6,
+            $sockType,
         );
 
         $this->logger->info(\sprintf(
-            'listen: %s://%s',
-            'http',
+            'listen(http): %s://%s',
+            $sockType === SWOOLE_UNIX_STREAM ? 'unix' : 'tcp',
             $this->listen,
         ));
         $this->logger->info(\sprintf(
-            'listen: %s://%s',
-            'ws',
+            'listen(ws): %s://%s',
+            $sockType === SWOOLE_UNIX_STREAM ? 'unix' : 'tcp',
             $this->listen,
         ));
+        if (SWOOLE_UNIX_STREAM === $sockType) {
+            self::setSocketOwnership($listen[0]);
+        }
 
         $server->set($this->config);
-        $listen = parse_str_ip_and_port($this->listenWS);
+        $listen = parse_str_ip_and_port($this->listenWS, 1229);
+        if ($listen[2] ?? false) {
+            $sockType = SWOOLE_UNIX_STREAM;
+        } else {
+            $sockType = SWOOLE_SOCK_TCP | SWOOLE_SOCK_TCP6;
+        }
         $server->addlistener(
             $listen[0] ?: '127.0.0.1',
-            (int) ($listen[1] ?? 1229),
-            $server->mode,
+            (int) $listen[1],
+            $sockType,
         );
         $this->logger->info(\sprintf(
-            'listen: %s://%s',
-            'ws',
+            'listen(ws): %s://%s',
+            $sockType === SWOOLE_UNIX_STREAM ? 'unix' : 'tcp',
             $this->listenWS,
         ));
+        if (SWOOLE_UNIX_STREAM === $sockType) {
+            self::setSocketOwnership($listen[0]);
+        }
 
         $this->server = $server;
 
         $this->initEvent();
+    }
+
+    protected static function setSocketOwnership(string $filename): void
+    {
+        if (isset($_ENV['SL_LISTEN_UNIX_SOCK_CHMOD'])) {
+            @chmod($filename, octdec($_ENV['SL_LISTEN_UNIX_SOCK_CHMOD'] ?: '0755'));
+        }
+        if (!empty($_ENV['SL_LISTEN_UNIX_SOCK_USER'])) {
+            @chown($filename, $_ENV['SL_LISTEN_UNIX_SOCK_USER']);
+        }
+        if (!empty($_ENV['SL_LISTEN_UNIX_SOCK_GROUP'])) {
+            @chgrp($filename, $_ENV['SL_LISTEN_UNIX_SOCK_GROUP']);
+        }
     }
 
     protected function initEvent(): void

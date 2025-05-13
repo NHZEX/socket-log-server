@@ -41,10 +41,14 @@ docker pull ghcr.io/nhzex/socket-log-server:latest
 ```dotenv
 # 工作进程数量，默认1就行，没有调大的价值
 SL_WORKER_NUM=1
-# 主端口监听，支持ipv6（http+ws双协议。不区分客户端连入）
+# 主端口监听，支持ipv6、unix（http+ws双协议。不区分客户端连入）
 SL_SERVER_LISTEN=[::]:1116
 # 兼容老客户端的独立端口，默认启用，后续会弃用
 SL_SERVER_BC_LISTEN=0.0.0.0:1229
+# 监听unix socket 权限设置，需要开启才生效
+SL_LISTEN_UNIX_SOCK_MODE=0755
+SL_LISTEN_UNIX_SOCK_USER=www-data
+SL_LISTEN_UNIX_SOCK_GROUP=www-data
 # 允许中转连入的客户端ID白名单，为空则不启用
 # 匹配语法参考php函数`fnmatch`：https://www.php.net/manual/en/function.fnmatch.php
 SL_ALLOW_CLIENT_LIST="
