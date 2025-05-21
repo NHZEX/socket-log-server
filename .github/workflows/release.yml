@@ -55,7 +55,7 @@ jobs:
       # https://www.swoole.com/download
       - name: Download
         run: |
-          curl -L -O https://github.com/swoole/swoole-cli/releases/download/v5.1.7.0/swoole-cli-v5.1.7-linux-x64.tar.xz
+          curl -L -O https://github.com/swoole/swoole-cli/releases/download/v6.0.2.0/swoole-cli-v6.0.2-linux-x64.tar.xz
           tar -xvf swoole-cli-*.tar.xz
           ls -lh .
       - name: Test
