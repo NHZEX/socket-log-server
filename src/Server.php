@@ -21,6 +21,7 @@ class Server
      * 辅助监听地址 用于兼容，仅支持ws推送
      */
     protected string                 $listenWS     = '0.0.0.0:1229';
+    protected string                 $listenHttp   = '';
     private \Swoole\WebSocket\Server $server;
     private array                    $broadcastMap = [];
     private array                    $clientIdMap  = [];
@@ -68,9 +69,18 @@ class Server
             );
 
         $dotenv
+            ->ifPresent('SL_SERVER_HTTP_LISTEN')
+            ->assert(function (?string $val): bool {
+                if ('false' === $val || empty($val))  {
+                    return true;
+                }
+                return test_address_and_port($val);
+            }, \sprintf('(%s) address is invalid', $_ENV['SL_SERVER_HTTP_LISTEN'] ?? ''));
+
+        $dotenv
             ->ifPresent('SL_SERVER_BC_LISTEN')
-            ->assert(function (string $val): bool {
-                if ('false' === $val)  {
+            ->assert(function (?string $val): bool {
+                if ('false' === $val || empty($val))  {
                     return true;
                 }
                 return test_address_and_port($val);
@@ -84,60 +94,79 @@ class Server
     {
         $this->listen = $_ENV['SL_SERVER_LISTEN'] ?? $this->listen;
         $this->listenWS = $_ENV['SL_SERVER_BC_LISTEN'] ?? $this->listenWS;
+        $this->listenHttp = $_ENV['SL_SERVER_HTTP_LISTEN'] ?? '';
 
         if (!empty($_ENV['SL_ALLOW_CLIENT_LIST'])) {
             $this->allowClient = \array_filter(\array_map('\trim', \explode("\n", $_ENV['SL_ALLOW_CLIENT_LIST'])));
         }
     }
 
-    protected function create(): void
+    protected static function parseStrToListenAddr(string $str, int $defaultPort): array
     {
-        $listen = parse_str_ip_and_port($this->listen, 1116);
+        $listen = parse_str_ip_and_port($str, $defaultPort);
         if ($listen[2] ?? false) {
             $sockType = SWOOLE_UNIX_STREAM;
         } else {
             $sockType = SWOOLE_SOCK_TCP | SWOOLE_SOCK_TCP6;
         }
+        return [
+            'host' => $listen[0],
+            'port' => (int) $listen[1],
+            'sock' => $sockType,
+        ];
+    }
+
+    protected function create(): void
+    {
+        $listen = self::parseStrToListenAddr($this->listen, 1116);
         $server = new \Swoole\WebSocket\Server(
-            $listen[0] ?: '127.0.0.1',
-            (int) $listen[1],
+            $listen['host'] ?: '127.0.0.1',
+            $listen['port'],
             SWOOLE_BASE,
-            $sockType,
+            $listen['sock'],
         );
 
         $this->logger->info(\sprintf(
-            'listen(http): %s://%s',
-            $sockType === SWOOLE_UNIX_STREAM ? 'unix' : 'tcp',
+            'listen(http+ws): %s://%s',
+            $listen['sock'] === SWOOLE_UNIX_STREAM ? 'unix' : 'tcp',
             $this->listen,
         ));
-        $this->logger->info(\sprintf(
-            'listen(ws): %s://%s',
-            $sockType === SWOOLE_UNIX_STREAM ? 'unix' : 'tcp',
-            $this->listen,
-        ));
-        if (SWOOLE_UNIX_STREAM === $sockType) {
+        if (SWOOLE_UNIX_STREAM === $listen['sock']) {
             self::setSocketOwnership($listen[0]);
         }
 
         $server->set($this->config);
-        $listen = parse_str_ip_and_port($this->listenWS, 1229);
-        if ($listen[2] ?? false) {
-            $sockType = SWOOLE_UNIX_STREAM;
-        } else {
-            $sockType = SWOOLE_SOCK_TCP | SWOOLE_SOCK_TCP6;
-        }
+
+        $listen = self::parseStrToListenAddr($this->listenWS, 1229);
         $server->addlistener(
-            $listen[0] ?: '127.0.0.1',
-            (int) $listen[1],
-            $sockType,
+            $listen['host'] ?: '127.0.0.1',
+            $listen['port'],
+            $listen['sock'],
         );
         $this->logger->info(\sprintf(
             'listen(ws): %s://%s',
-            $sockType === SWOOLE_UNIX_STREAM ? 'unix' : 'tcp',
+            $listen['sock'] === SWOOLE_UNIX_STREAM ? 'unix' : 'tcp',
             $this->listenWS,
         ));
-        if (SWOOLE_UNIX_STREAM === $sockType) {
+        if (SWOOLE_UNIX_STREAM === $listen['sock']) {
             self::setSocketOwnership($listen[0]);
+        }
+
+        if ($this->listenHttp && $this->listenHttp !== $this->listen) {
+            $listen = self::parseStrToListenAddr($this->listenHttp, 0);
+            $server->addlistener(
+                $listen['host'],
+                $listen['port'],
+                $listen['sock'],
+            );
+            $this->logger->info(\sprintf(
+                'listen(http): %s://%s',
+                $listen['sock'] === SWOOLE_UNIX_STREAM ? 'unix' : 'tcp',
+                $this->listenHttp,
+            ));
+            if (SWOOLE_UNIX_STREAM === $listen['sock']) {
+                self::setSocketOwnership($listen[0]);
+            }
         }
 
         $this->server = $server;
