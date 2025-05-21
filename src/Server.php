@@ -176,7 +176,8 @@ class Server
 
     protected static function setSocketOwnership(string $filename): void
     {
-        if (isset($_ENV['SL_LISTEN_UNIX_SOCK_CHMOD'])) {
+        $mode = $_ENV['SL_LISTEN_UNIX_SOCK_MODE'] ?? ($_ENV['SL_LISTEN_UNIX_SOCK_CHMOD'] ?? null);
+        if ($mode && ctype_digit($mode)) {
             @chmod($filename, octdec($_ENV['SL_LISTEN_UNIX_SOCK_CHMOD'] ?: '0755'));
         }
         if (!empty($_ENV['SL_LISTEN_UNIX_SOCK_USER'])) {
