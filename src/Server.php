@@ -132,7 +132,7 @@ class Server
             $this->listen,
         ));
         if (SWOOLE_UNIX_STREAM === $listen['sock']) {
-            self::setSocketOwnership($listen[0]);
+            self::setSocketOwnership($listen['host']);
         }
 
         $server->set($this->config);
@@ -149,7 +149,7 @@ class Server
             $this->listenWS,
         ));
         if (SWOOLE_UNIX_STREAM === $listen['sock']) {
-            self::setSocketOwnership($listen[0]);
+            self::setSocketOwnership($listen['host']);
         }
 
         if ($this->listenHttp && $this->listenHttp !== $this->listen) {
@@ -165,7 +165,7 @@ class Server
                 $this->listenHttp,
             ));
             if (SWOOLE_UNIX_STREAM === $listen['sock']) {
-                self::setSocketOwnership($listen[0]);
+                self::setSocketOwnership($listen['host']);
             }
         }
 
