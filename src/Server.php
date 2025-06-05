@@ -101,9 +101,12 @@ class Server
         }
     }
 
-    protected static function parseStrToListenAddr(string $str, int $defaultPort): array
+    protected static function parseStrToListenAddr(string $str, int $defaultPort): ?array
     {
         $listen = parse_str_ip_and_port($str, $defaultPort);
+        if ($listen === null) {
+            return null;
+        }
         if ($listen[2] ?? false) {
             $sockType = SWOOLE_UNIX_STREAM;
         } else {
