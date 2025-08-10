@@ -1,4 +1,4 @@
-FROM phpswoole/swoole:5.1.7-php8.1-alpine
+FROM phpswoole/swoole:6.0.2-php8.3-alpine
 
 RUN set -eux \
     && mkdir -p /opt/socket-log
